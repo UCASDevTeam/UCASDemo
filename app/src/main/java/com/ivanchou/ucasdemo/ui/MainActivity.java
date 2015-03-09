@@ -22,11 +22,12 @@ import com.ivanchou.ucasdemo.ui.fragment.PosterAlbumFragment;
 import com.ivanchou.ucasdemo.ui.fragment.TimeLineFragment;
 import com.ivanchou.ucasdemo.ui.fragment.DetailsFragment.DetailsCallback;
 import com.ivanchou.ucasdemo.ui.fragment.PosterAlbumFragment.PosterAlbumCallback;
+import com.ivanchou.ucasdemo.ui.fragment.PostNewFragment.PostNewCallback;
 
 /**
  * Created by ivanchou on 1/15/2015.
  */
-public class MainActivity extends BaseActivity implements NavigationDrawerCallback, DetailsCallback, PosterAlbumCallback {
+public class MainActivity extends BaseActivity implements NavigationDrawerCallback, DetailsCallback, PosterAlbumCallback, PostNewCallback {
     private CharSequence mTitle;
 
     private static final int TIME_LINE_FRAGMENT = 0;
