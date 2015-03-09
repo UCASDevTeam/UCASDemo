@@ -1,15 +1,20 @@
 package com.ivanchou.ucasdemo.ui.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import com.ivanchou.ucasdemo.R;
 import com.ivanchou.ucasdemo.core.model.EventModel;
 import com.ivanchou.ucasdemo.core.model.TagModel;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.zip.Inflater;
 
 /**
  * Created by ivanchou on 1/19/2015.
@@ -45,6 +51,7 @@ public class PostNewFragment extends BaseFragment {
     private Button mPost;
     private Button mMap;
     private Switch mPrivate;
+    private PopupWindow mTimePicker;
 
     private TagModel [] mTags;
     private TagModel [] mNameTags;
@@ -156,7 +163,19 @@ public class PostNewFragment extends BaseFragment {
         mTextLocate.setText("地点");
 
         mStartAt.setText(mEvent.startAt);
+        mStartAt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickTime(0);
+            }
+        });
         mEndAt.setText(mEvent.endAt);
+        mEndAt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickTime(1);
+            }
+        });
 
         mInvite.setText("邀请");
         mInvite.setOnClickListener(new View.OnClickListener() {
@@ -218,6 +237,18 @@ public class PostNewFragment extends BaseFragment {
         }
         mTagsViewNames.setCustomTags(mNameTags);
         mTagsViewNames.invalidate();
+    }
+
+    private void pickTime(int textViewID)
+    {
+        LinearLayout layout = (LinearLayout)this.getActivity().getLayoutInflater().inflate(R.layout.popup_time_picker,null);
+        mTimePicker = new PopupWindow(layout, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        mTimePicker.setFocusable(true);
+        mTimePicker.setOutsideTouchable(true);
+        mTimePicker.update();
+        mTimePicker.setBackgroundDrawable(new BitmapDrawable());
+        mTimePicker.showAtLocation(mPostNewView, Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,0,0);
+
     }
     public interface PostNewCallback {
         public void onPostNewFragmentClick(int viewID);
