@@ -220,6 +220,6 @@ public class PostNewFragment extends BaseFragment {
         mTagsViewNames.invalidate();
     }
     public interface PostNewCallback {
-
+        public void onPostNewFragmentClick(int viewID);
     }
 }

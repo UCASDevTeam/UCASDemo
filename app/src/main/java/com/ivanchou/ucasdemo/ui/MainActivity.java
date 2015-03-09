@@ -179,6 +179,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerCallba
         return mImageViews;
     }
 
+    @Override
+    public void onPostNewFragmentClick(int viewID) {
 
-
+    }
 }
