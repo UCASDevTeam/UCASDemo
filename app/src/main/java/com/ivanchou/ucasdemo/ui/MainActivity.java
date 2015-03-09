@@ -17,6 +17,7 @@ import com.ivanchou.ucasdemo.ui.fragment.DetailsFragment;
 import com.ivanchou.ucasdemo.ui.fragment.JointedFragment;
 import com.ivanchou.ucasdemo.ui.fragment.NavigationDrawerFragment;
 import com.ivanchou.ucasdemo.ui.fragment.NavigationDrawerFragment.NavigationDrawerCallback;
+import com.ivanchou.ucasdemo.ui.fragment.PostNewFragment;
 import com.ivanchou.ucasdemo.ui.fragment.PosterAlbumFragment;
 import com.ivanchou.ucasdemo.ui.fragment.TimeLineFragment;
 import com.ivanchou.ucasdemo.ui.fragment.DetailsFragment.DetailsCallback;
@@ -30,12 +31,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerCallba
 
     private static final int TIME_LINE_FRAGMENT = 0;
     private static final int JOINTED_FRAGMENT = 1;
+    private static final int POST_NEW_FRAGMENT = 2;
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private TimeLineFragment mTimeLineFragment;
     private JointedFragment mJointedFragment;
     private DetailsFragment mDetailsFragment;
     private PosterAlbumFragment mPosterAlbumFragment;
+    private PostNewFragment mPostNewFragment;
 
     private ImageView [] mImageViews;
 
@@ -73,6 +76,13 @@ public class MainActivity extends BaseActivity implements NavigationDrawerCallba
                 }
                 mTitle = getString(R.string.drawer_item_jointed);
                 fragmentTransaction.replace(R.id.content_frame, mJointedFragment);
+                break;
+            case POST_NEW_FRAGMENT:
+                if(mPostNewFragment == null) {
+                    mPostNewFragment = new PostNewFragment();
+                }
+                mTitle = getString(R.string.drawer_item_post_new);
+                fragmentTransaction.replace(R.id.content_frame,mPostNewFragment);
                 break;
         }
         setTitle(mTitle);

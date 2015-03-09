@@ -22,6 +22,7 @@ public class DrawerAdapter extends BaseAdapter{
         mTitles = new String[]{
                 context.getResources().getString(R.string.drawer_item_timeline),
                 context.getResources().getString(R.string.drawer_item_jointed),
+                context.getResources().getString(R.string.drawer_item_post_new),
         };
     }
 
