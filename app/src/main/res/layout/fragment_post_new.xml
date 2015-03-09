@@ -22,52 +22,69 @@
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
-                        android:id="@+id/bt_post_new_invite"/>
+                        android:id="@+id/bt_post_new_invite"
+                        android:layout_weight="1"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
-                        android:id="@+id/tv_post_new_private"/>
+                        android:id="@+id/tv_post_new_private"
+                        android:layout_weight="1"/>
                     <Switch
                         android:layout_width="wrap_content"
                         android:layout_height="fill_parent"
-                        android:id="@+id/sw_post_new_private"/>
+                        android:id="@+id/sw_post_new_private"
+                        android:layout_weight="1"/>
                 </LinearLayout>
             <com.ivanchou.ucasdemo.ui.view.FooterTagsView
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:id="@+id/ftv_post_new_names"/>
             <TextView
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_post_new_title" />
             <EditText
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:id="@+id/et_post_new_title"/>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/tv_post_new_start_at"
+                    android:layout_weight="1"/>
                 <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/iv_post_new_arrow"
+                    android:layout_weight="1"/>
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/tv_post_new_end_at"
+                    android:layout_weight="1"/>
                 </LinearLayout>
             <TextView
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_post_new_locate_at"/>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <EditText
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/et_post_new_locate_at"
+                    android:layout_weight="1"/>
                 <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/bt_post_new_map"
+                    android:layout_weight="1"/>
                 </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -78,9 +95,13 @@
         android:orientation="horizontal">
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            android:id="@+id/bt_post_new_advanced"
+            android:layout_weight="1"/>
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            android:id="@+id/bt_post_new_post"
+            android:layout_weight="1"/>
         </LinearLayout>
 </LinearLayout>
