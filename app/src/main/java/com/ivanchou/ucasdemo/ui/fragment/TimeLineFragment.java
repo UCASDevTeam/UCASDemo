@@ -66,7 +66,7 @@ public class TimeLineFragment extends BaseFragment implements OnRefreshListener,
         footerTagsView = (FooterTagsView) view.findViewById(R.id.ftv_footer);
 
         mTags = mTagsDataHelper.query();
-        if (mTags != null || mTags.length != 0) {
+        if (mTags != null && mTags.length != 0) {
             footerTagsView.setCustomTags(mTags);
             footerTagsView.setOnTagClickListener(this);
             mListView.setTagsView(footerTagsView);

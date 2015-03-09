@@ -35,10 +35,6 @@
                         android:id="@+id/sw_post_new_private"
                         android:layout_weight="1"/>
                 </LinearLayout>
-            <com.ivanchou.ucasdemo.ui.view.FooterTagsView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/ftv_post_new_names"/>
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -86,6 +82,10 @@
                     android:id="@+id/bt_post_new_map"
                     android:layout_weight="1"/>
                 </LinearLayout>
+            <com.ivanchou.ucasdemo.ui.view.FooterTagsView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ftv_post_new_names"/>
         </LinearLayout>
     </ScrollView>
     <LinearLayout

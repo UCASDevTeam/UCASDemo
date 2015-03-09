@@ -16,6 +16,12 @@ import com.ivanchou.ucasdemo.core.model.TagModel;
 import com.ivanchou.ucasdemo.ui.base.BaseFragment;
 import com.ivanchou.ucasdemo.ui.view.FooterTagsView;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
 /**
  * Created by ivanchou on 1/19/2015.
  */
@@ -42,8 +48,12 @@ public class PostNewFragment extends BaseFragment {
 
     private TagModel [] mTags;
     private TagModel [] mNameTags;
+    private List<TagModel> mNameList;
 
     private EventModel mEvent;
+
+    private boolean mTitleLock;
+    private int mNameLocalID;
 
     @Override
     public void onAttach(Activity activity) {
@@ -59,6 +69,8 @@ public class PostNewFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mNameLocalID = 0;
+        mNameList = new ArrayList<TagModel>();
     }
 
     @Override
@@ -100,15 +112,33 @@ public class PostNewFragment extends BaseFragment {
         String [] names = new String[]{"运动","娱乐","游戏","体育","竞技","讲座","农场","地主","训练"};
         mTags = new TagModel[9];
         for (int i=0;i<9;i++){
+            mTags[i] = new TagModel();
             mTags[i].tagId = i;
             mTags[i].tagName = names[i];
         }
+
+        mNameTags = null;
     }
 
     private void initView(){
-        if (mTags != null || mTags.length != 0) {
+        if (mTags != null && mTags.length != 0) {
             mTagsViewTags.setCustomTags(mTags);
             mTagsViewTags.setOnTagClickListener(new FooterTagsView.OnTagClickListener() {
+                @Override
+                public void onTagClickRefresh(int tags) {
+                    tagsChange(tags);
+                }
+
+                @Override
+                public void onTagLongClickRefresh(int tags) {
+                    tagsChange(tags);
+                }
+            });
+        }
+
+        if(mNameTags != null && mNameTags.length != 0) {
+            mTagsViewNames.setCustomTags(mNameTags);
+            mTagsViewNames.setOnTagClickListener(new FooterTagsView.OnTagClickListener() {
                 @Override
                 public void onTagClickRefresh(int tags) {
 
@@ -119,10 +149,6 @@ public class PostNewFragment extends BaseFragment {
 
                 }
             });
-        }
-
-        if(mNameTags != null || mNameTags.length != 0) {
-            mTagsViewNames.setCustomTags(mNameTags);
         }
 
         mTextPrivate.setText("私有");
@@ -136,7 +162,7 @@ public class PostNewFragment extends BaseFragment {
         mInvite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                invitePeople();
             }
         });
 
@@ -156,10 +182,42 @@ public class PostNewFragment extends BaseFragment {
             }
         });
 
+        mMap.setText("Map");
+        mMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     private void initData(){
         mEvent = new EventModel();
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd\nhh:mm:ss");
+        String Data = format.format(new Date(System.currentTimeMillis()));
+        mEvent.startAt = Data;
+        mEvent.endAt = Data;
+    }
+
+    private void tagsChange(int tags){
+        mTitle.setText(Integer.toBinaryString(tags));
+        mTitle.invalidate();
+    }
+
+    private void invitePeople(){
+        TagModel tagModel = new TagModel();
+        tagModel.tagId = mNameLocalID;
+        tagModel.tagName = "张氏" + (int)(Math.random()*100);
+        mNameList.add(tagModel);
+
+        mNameTags = new TagModel[mNameList.size()];
+        for (int i=0;i<mNameList.size();i++){
+            mNameTags[i] = mNameList.get(i);
+        }
+        mTagsViewNames.setCustomTags(mNameTags);
+        mTagsViewNames.invalidate();
     }
     public interface PostNewCallback {
 
