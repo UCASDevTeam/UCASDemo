@@ -2,22 +2,31 @@ package com.ivanchou.ucasdemo.ui.fragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
 import com.ivanchou.ucasdemo.R;
 import com.ivanchou.ucasdemo.core.model.EventModel;
 import com.ivanchou.ucasdemo.core.model.TagModel;
+import com.ivanchou.ucasdemo.ui.base.BaseActivity;
 import com.ivanchou.ucasdemo.ui.base.BaseFragment;
 import com.ivanchou.ucasdemo.ui.view.FooterTagsView;
 
@@ -32,6 +41,9 @@ import java.util.zip.Inflater;
  * Created by ivanchou on 1/19/2015.
  */
 public class PostNewFragment extends BaseFragment {
+
+    private static final int START_AT_TIME_PICKER = 0;
+    private static final int END_AT_TIME_PICKER = 1;
 
     private PostNewCallback mCallback;
     private Activity mActivity;
@@ -52,15 +64,20 @@ public class PostNewFragment extends BaseFragment {
     private Button mMap;
     private Switch mPrivate;
     private PopupWindow mTimePicker;
+    private TimePicker mDateTimePicker;
+    private DatePicker mDateDatePicker;
 
     private TagModel [] mTags;
     private TagModel [] mNameTags;
     private List<TagModel> mNameList;
 
     private EventModel mEvent;
+    private Date mDateStartAt;
+    private Date mDateEndAt;
 
     private boolean mTitleLock;
     private int mNameLocalID;
+    private SimpleDateFormat mFormat;
 
     @Override
     public void onAttach(Activity activity) {
@@ -166,14 +183,14 @@ public class PostNewFragment extends BaseFragment {
         mStartAt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pickTime(0);
+                pickTime(START_AT_TIME_PICKER);
             }
         });
         mEndAt.setText(mEvent.endAt);
         mEndAt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pickTime(1);
+                pickTime(END_AT_TIME_PICKER);
             }
         });
 
@@ -214,10 +231,11 @@ public class PostNewFragment extends BaseFragment {
     private void initData(){
         mEvent = new EventModel();
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd\nhh:mm:ss");
-        String Data = format.format(new Date(System.currentTimeMillis()));
-        mEvent.startAt = Data;
-        mEvent.endAt = Data;
+        mDateStartAt = new Date(System.currentTimeMillis());
+        mDateEndAt = new Date(System.currentTimeMillis());
+        mFormat = new SimpleDateFormat("yyyy/MM/dd\nhh:mm:ss");
+        mEvent.startAt = mFormat.format(mDateStartAt);
+        mEvent.endAt = mFormat.format(mDateEndAt);
     }
 
     private void tagsChange(int tags){
@@ -239,16 +257,112 @@ public class PostNewFragment extends BaseFragment {
         mTagsViewNames.invalidate();
     }
 
-    private void pickTime(int textViewID)
+    private void pickTime(final int textViewID)
     {
         LinearLayout layout = (LinearLayout)this.getActivity().getLayoutInflater().inflate(R.layout.popup_time_picker,null);
         mTimePicker = new PopupWindow(layout, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         mTimePicker.setFocusable(true);
         mTimePicker.setOutsideTouchable(true);
         mTimePicker.update();
-        mTimePicker.setBackgroundDrawable(new BitmapDrawable());
+        mTimePicker.setBackgroundDrawable(new Drawable() {
+            @Override
+            public void draw(Canvas canvas) {
+                canvas.drawColor(Color.WHITE);
+            }
+
+            @Override
+            public void setAlpha(int i) {
+
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+
+            }
+
+            @Override
+            public int getOpacity() {
+                return 0;
+            }
+        });
         mTimePicker.showAtLocation(mPostNewView, Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,0,0);
 
+        mDateTimePicker = (TimePicker) layout.findViewById(R.id.tp_time_picker_time);
+        mDateDatePicker = (DatePicker) layout.findViewById(R.id.dp_time_picker_date);
+
+        int year = 0;
+        int mouth = 0;
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
+        switch (textViewID){
+            case START_AT_TIME_PICKER:
+                year = mDateStartAt.getYear() + 1900;
+                mouth = mDateStartAt.getMonth();
+                day = mDateStartAt.getDate();
+                hour = mDateStartAt.getHours();
+                minute = mDateStartAt.getMinutes();
+                break;
+            case END_AT_TIME_PICKER:
+                year = mDateEndAt.getYear() + 1900;
+                mouth = mDateEndAt.getMonth();
+                day = mDateEndAt.getDate();
+                hour = mDateEndAt.getHours();
+                minute = mDateEndAt.getMinutes();
+                break;
+        }
+
+        Log.e("GetDate", "Year:" + year + "Mouth:" + mouth + "Day:" + day + "Hour:" + hour + "Minute:" + minute);
+        mDateTimePicker.setIs24HourView(true);
+        mDateTimePicker.setCurrentHour(hour);
+        mDateTimePicker.setCurrentMinute(minute);
+        mDateTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int i, int i2) {
+                Log.e("TimePicker", "Hour:" + i + "Minute:" + i2);
+                switch (textViewID){
+                    case START_AT_TIME_PICKER:
+                        mDateStartAt.setHours(i);
+                        mDateStartAt.setMinutes(i2);
+                        mEvent.startAt = mFormat.format(mDateStartAt);
+                        mStartAt.setText(mEvent.startAt);
+                        mStartAt.invalidate();
+                        break;
+                    case END_AT_TIME_PICKER:
+                        mDateEndAt.setHours(i);
+                        mDateEndAt.setMinutes(i2);
+                        mEvent.endAt = mFormat.format(mDateEndAt);
+                        mEndAt.setText(mEvent.endAt);
+                        mEndAt.invalidate();
+                        break;
+                }
+            }
+        });
+
+        mDateDatePicker.init(year,mouth,day,new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker datePicker, int i, int i2, int i3) {
+                Log.e("DatePicker", "year:" + i + "Mouth:" + i2 + "Day:" + i3);
+                switch (textViewID) {
+                    case START_AT_TIME_PICKER:
+                        mDateStartAt.setYear(i-1900);
+                        mDateStartAt.setMonth(i2);
+                        mDateStartAt.setDate(i3);
+                        mEvent.startAt = mFormat.format(mDateStartAt);
+                        mStartAt.setText(mEvent.startAt);
+                        mStartAt.invalidate();
+                        break;
+                    case END_AT_TIME_PICKER:
+                        mDateEndAt.setYear(i-1900);
+                        mDateEndAt.setMonth(i2);
+                        mDateEndAt.setDate(i3);
+                        mEvent.endAt = mFormat.format(mDateEndAt);
+                        mEndAt.setText(mEvent.endAt);
+                        mEndAt.invalidate();
+                        break;
+                }
+            }
+        });
     }
     public interface PostNewCallback {
         public void onPostNewFragmentClick(int viewID);
