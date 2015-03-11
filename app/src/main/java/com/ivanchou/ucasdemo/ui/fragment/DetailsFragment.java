@@ -1,6 +1,8 @@
 package com.ivanchou.ucasdemo.ui.fragment;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -23,6 +25,7 @@ public class DetailsFragment extends BaseFragment {
     private Activity mActivity;
     private View mDetailsView;
     private View mFragmentContainerView;
+    private PosterAlbumFragment mPosterAlbumFragment;
     private DetailsCallback mCallback;
 
     public static final int POSTER_ON_CLICK = 0;
@@ -38,6 +41,8 @@ public class DetailsFragment extends BaseFragment {
     private TextView mSupportView;
     private Button mMapButton;
     private ImageView mPosterView;
+
+    private ImageView [] mImageViews;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,7 +66,6 @@ public class DetailsFragment extends BaseFragment {
 
         setListener();
 
-        mEvent =  mCallback.getEvent();
         createTestEvent();
         drawView();
         return view;
@@ -126,7 +130,7 @@ public class DetailsFragment extends BaseFragment {
         mPosterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCallback.onDetailsFragmentClick(POSTER_ON_CLICK);
+                onDetailsFragmentClick(POSTER_ON_CLICK);
             }
         });
     }
@@ -152,11 +156,54 @@ public class DetailsFragment extends BaseFragment {
                 "力，应用天团必将屹立于世界之巅，为中华之崛起奉献出自己的力量！最后，热烈感谢" +
                 "前来聆听报告的各位领导以及老同志们，向各位领导以及老同志致以节日的祝福！";
         //mEvent.supporter = "中共中央国务院，中共中央巡视组，中共中央统战部";
+        reSolvePosterImage();
 
     }
+
+    /*  解析海报图像  */
+    private void reSolvePosterImage(){
+        int [] mImages = new int[] {
+                R.drawable.m1, R.drawable.m2, R.drawable.m3, R.drawable.m4, R.drawable.m5,
+                R.drawable.m6, R.drawable.m7, R.drawable.m8, R.drawable.m9, R.drawable.m10
+        };
+
+        mImageViews = new ImageView[mImages.length];
+        for (int i=0;i<mImages.length;i++){
+            ImageView imageView = new ImageView(this.getActivity());
+            imageView.setImageResource(mImages[i]);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setAdjustViewBounds(true);
+            mImageViews[i] = imageView;
+        }
+    }
+    /*  详情界面借口函数
+    *   onDetailsFragmentClick
+    *       收集来自详情界面的点击事件
+    *   getEvent
+    *       详情界面读取事件*/
+    public void onDetailsFragmentClick(int viewID) {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        switch (viewID){
+            case DetailsFragment.POSTER_ON_CLICK:
+                if (mPosterAlbumFragment == null){
+                    mPosterAlbumFragment = new PosterAlbumFragment();
+                }
+                fragmentTransaction.add(R.id.content_frame,mPosterAlbumFragment).addToBackStack("DetailsFragment");
+                break;
+            case DetailsFragment.MAP_ON_CLICK:
+                break;
+            default:
+                break;
+        }
+        fragmentTransaction.commit();
+    }
+
+    public EventModel getEvent() {
+        return null;
+    }
+
     /*End Test*/
     public interface DetailsCallback{
-        public void onDetailsFragmentClick(int viewID);
-        public EventModel getEvent();
+
     }
 }

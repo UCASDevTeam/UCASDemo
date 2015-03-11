@@ -2,6 +2,7 @@ package com.ivanchou.ucasdemo.ui.fragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -17,6 +18,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Switch;
@@ -364,7 +366,11 @@ public class PostNewFragment extends BaseFragment {
             }
         });
     }
+
+    public void onPostNewFragmentClick(int viewID) {
+
+    }
+
     public interface PostNewCallback {
-        public void onPostNewFragmentClick(int viewID);
     }
 }
