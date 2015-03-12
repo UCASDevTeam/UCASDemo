@@ -3,6 +3,7 @@ package com.ivanchou.ucasdemo.ui.fragment;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -42,6 +43,12 @@ public class PosterAlbumFragment extends BaseFragment {
         mViewPager = (ViewPager) mPosterAlbumView.findViewById(R.id.vp_poster_album_poster);
         mBackView = (ImageView) mPosterAlbumView.findViewById(R.id.iv_poster_album_back);
 
+        mPagerAdapter = new PosterPagerAdapter(this.getActivity(),mImageViews);
+        mViewPager.setAdapter(mPagerAdapter);
+        if(mImageViews.length > 1){
+            mViewPager.setCurrentItem(mImageViews.length*50);
+        }
+
         setListener();
         return view;
     }
@@ -50,6 +57,18 @@ public class PosterAlbumFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+        releaseFragmentStack();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        releaseFragmentStack();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -65,6 +84,9 @@ public class PosterAlbumFragment extends BaseFragment {
 
     public void setImageViews(ImageView [] imageViews){
         mImageViews = imageViews;
+    }
+
+    public void freshViewPager(){
         mPagerAdapter = new PosterPagerAdapter(this.getActivity(),mImageViews);
         mViewPager.setAdapter(mPagerAdapter);
         if(mImageViews.length > 1){
@@ -79,6 +101,7 @@ public class PosterAlbumFragment extends BaseFragment {
     }
 
     private void setListener(){
+        if(mImageViews == null) return;
         for (int i=0;i<mImageViews.length;i++) {
             mImageViews[i].setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,6 +112,11 @@ public class PosterAlbumFragment extends BaseFragment {
         }
     }
 
+    public void releaseFragmentStack(){
+        for (int i =0;i<getFragmentManager().getBackStackEntryCount();i++){
+            getFragmentManager().popBackStack();
+        }
+    }
     /*  相册界面接口
 *   onPosterAlbumQuit
 *       相册界面的退出接口

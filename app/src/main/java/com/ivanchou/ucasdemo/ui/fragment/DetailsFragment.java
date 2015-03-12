@@ -86,6 +86,18 @@ public class DetailsFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+        releaseFragmentStack();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        releaseFragmentStack();
     }
 
     private void drawView(){
@@ -133,6 +145,12 @@ public class DetailsFragment extends BaseFragment {
                 onDetailsFragmentClick(POSTER_ON_CLICK);
             }
         });
+    }
+
+    private void releaseFragmentStack(){
+        for (int i =0;i<getFragmentManager().getBackStackEntryCount();i++){
+            getFragmentManager().popBackStack();
+        }
     }
     /*
         create test event
@@ -188,6 +206,7 @@ public class DetailsFragment extends BaseFragment {
                 if (mPosterAlbumFragment == null){
                     mPosterAlbumFragment = new PosterAlbumFragment();
                 }
+                mPosterAlbumFragment.setImageViews(mImageViews);
                 fragmentTransaction.add(R.id.content_frame,mPosterAlbumFragment).addToBackStack("DetailsFragment");
                 break;
             case DetailsFragment.MAP_ON_CLICK:
