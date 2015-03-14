@@ -37,6 +37,8 @@ public class EventModel {
 
     public String originalPic;
 
+    public boolean privateTag;
+
     public EventModel() {
 
     }

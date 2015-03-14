@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,6 +31,7 @@ import com.ivanchou.ucasdemo.core.model.EventModel;
 import com.ivanchou.ucasdemo.core.model.TagModel;
 import com.ivanchou.ucasdemo.ui.base.BaseActivity;
 import com.ivanchou.ucasdemo.ui.base.BaseFragment;
+import com.ivanchou.ucasdemo.ui.view.DateAndTimePickerView;
 import com.ivanchou.ucasdemo.ui.view.FooterTagsView;
 
 import java.text.SimpleDateFormat;
@@ -66,8 +68,7 @@ public class PostNewFragment extends BaseFragment {
     private Button mMap;
     private Switch mPrivate;
     private PopupWindow mTimePicker;
-    private TimePicker mDateTimePicker;
-    private DatePicker mDateDatePicker;
+    private DateAndTimePickerView mDatePickerView;
 
     private TagModel [] mTags;
     private TagModel [] mNameTags;
@@ -116,6 +117,8 @@ public class PostNewFragment extends BaseFragment {
         mAdvanced = (Button)mPostNewView.findViewById(R.id.bt_post_new_advanced);
         mPost = (Button)mPostNewView.findViewById(R.id.bt_post_new_post);
         mMap = (Button)mPostNewView.findViewById(R.id.bt_post_new_map);
+        mPrivate = (Switch)mPostNewView.findViewById(R.id.sw_post_new_private);
+        mDatePickerView = (DateAndTimePickerView)mPostNewView.findViewById(R.id.dtp_time_picker);
 
         createTags();
         initData();
@@ -228,6 +231,20 @@ public class PostNewFragment extends BaseFragment {
             }
         });
 
+        mPrivate.setChecked(true);
+        mPrivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Log.d("PostNewFragment", "Private Switch " + b);
+                if(b){
+                    mEvent.privateTag = true;
+                    mTextPrivate.setText("私有");
+                } else {
+                    mEvent.privateTag = false;
+                    mTextPrivate.setText("公开");
+                }
+            }
+        });
     }
 
     private void initData(){
@@ -235,7 +252,7 @@ public class PostNewFragment extends BaseFragment {
 
         mDateStartAt = new Date(System.currentTimeMillis());
         mDateEndAt = new Date(System.currentTimeMillis());
-        mFormat = new SimpleDateFormat("yyyy/MM/dd\nhh:mm:ss");
+        mFormat = new SimpleDateFormat("yyyy/MM/dd\nHH:mm:ss");
         mEvent.startAt = mFormat.format(mDateStartAt);
         mEvent.endAt = mFormat.format(mDateEndAt);
     }
@@ -262,6 +279,39 @@ public class PostNewFragment extends BaseFragment {
     private void pickTime(final int textViewID)
     {
         LinearLayout layout = (LinearLayout)this.getActivity().getLayoutInflater().inflate(R.layout.popup_time_picker,null);
+
+        mDatePickerView = (DateAndTimePickerView)layout.findViewById(R.id.dtp_time_picker);
+
+        switch (textViewID) {
+            case START_AT_TIME_PICKER:
+                mDatePickerView.setDate(mDateStartAt);
+                break;
+            case END_AT_TIME_PICKER:
+                mDatePickerView.setDate(mDateEndAt);
+                break;
+        }
+
+        mDatePickerView.initPicker();
+
+        mDatePickerView.setOnDateAndTimeChangeListener(new DateAndTimePickerView.OnDateAndTimeChangedListener() {
+            @Override
+            public void onDateAndTimeChanged(Date mDate) {
+                switch (textViewID){
+                    case START_AT_TIME_PICKER:
+                        mDateStartAt = mDate;
+                        mEvent.startAt = mFormat.format(mDateStartAt);
+                        mStartAt.setText(mEvent.startAt);
+                        mStartAt.invalidate();
+                        break;
+                    case END_AT_TIME_PICKER:
+                        mDateEndAt = mDate;
+                        mEvent.endAt = mFormat.format(mDateEndAt);
+                        mEndAt.setText(mEvent.endAt);
+                        mEndAt.invalidate();
+                        break;
+                }
+            }
+        });
         mTimePicker = new PopupWindow(layout, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         mTimePicker.setFocusable(true);
         mTimePicker.setOutsideTouchable(true);
@@ -288,83 +338,6 @@ public class PostNewFragment extends BaseFragment {
             }
         });
         mTimePicker.showAtLocation(mPostNewView, Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,0,0);
-
-        mDateTimePicker = (TimePicker) layout.findViewById(R.id.tp_time_picker_time);
-        mDateDatePicker = (DatePicker) layout.findViewById(R.id.dp_time_picker_date);
-
-        int year = 0;
-        int mouth = 0;
-        int day = 0;
-        int hour = 0;
-        int minute = 0;
-        switch (textViewID){
-            case START_AT_TIME_PICKER:
-                year = mDateStartAt.getYear() + 1900;
-                mouth = mDateStartAt.getMonth();
-                day = mDateStartAt.getDate();
-                hour = mDateStartAt.getHours();
-                minute = mDateStartAt.getMinutes();
-                break;
-            case END_AT_TIME_PICKER:
-                year = mDateEndAt.getYear() + 1900;
-                mouth = mDateEndAt.getMonth();
-                day = mDateEndAt.getDate();
-                hour = mDateEndAt.getHours();
-                minute = mDateEndAt.getMinutes();
-                break;
-        }
-
-        Log.e("GetDate", "Year:" + year + "Mouth:" + mouth + "Day:" + day + "Hour:" + hour + "Minute:" + minute);
-        mDateTimePicker.setIs24HourView(true);
-        mDateTimePicker.setCurrentHour(hour);
-        mDateTimePicker.setCurrentMinute(minute);
-        mDateTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker timePicker, int i, int i2) {
-                Log.e("TimePicker", "Hour:" + i + "Minute:" + i2);
-                switch (textViewID){
-                    case START_AT_TIME_PICKER:
-                        mDateStartAt.setHours(i);
-                        mDateStartAt.setMinutes(i2);
-                        mEvent.startAt = mFormat.format(mDateStartAt);
-                        mStartAt.setText(mEvent.startAt);
-                        mStartAt.invalidate();
-                        break;
-                    case END_AT_TIME_PICKER:
-                        mDateEndAt.setHours(i);
-                        mDateEndAt.setMinutes(i2);
-                        mEvent.endAt = mFormat.format(mDateEndAt);
-                        mEndAt.setText(mEvent.endAt);
-                        mEndAt.invalidate();
-                        break;
-                }
-            }
-        });
-
-        mDateDatePicker.init(year,mouth,day,new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker datePicker, int i, int i2, int i3) {
-                Log.e("DatePicker", "year:" + i + "Mouth:" + i2 + "Day:" + i3);
-                switch (textViewID) {
-                    case START_AT_TIME_PICKER:
-                        mDateStartAt.setYear(i-1900);
-                        mDateStartAt.setMonth(i2);
-                        mDateStartAt.setDate(i3);
-                        mEvent.startAt = mFormat.format(mDateStartAt);
-                        mStartAt.setText(mEvent.startAt);
-                        mStartAt.invalidate();
-                        break;
-                    case END_AT_TIME_PICKER:
-                        mDateEndAt.setYear(i-1900);
-                        mDateEndAt.setMonth(i2);
-                        mDateEndAt.setDate(i3);
-                        mEvent.endAt = mFormat.format(mDateEndAt);
-                        mEndAt.setText(mEvent.endAt);
-                        mEndAt.invalidate();
-                        break;
-                }
-            }
-        });
     }
 
     public void onPostNewFragmentClick(int viewID) {
@@ -373,4 +346,5 @@ public class PostNewFragment extends BaseFragment {
 
     public interface PostNewCallback {
     }
+
 }
