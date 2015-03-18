@@ -31,7 +31,11 @@ public class DetailsFragment extends BaseFragment {
     public static final int POSTER_ON_CLICK = 0;
     public static final int MAP_ON_CLICK = 1;
 
+    /*  事件参数    */
     private EventModel mEvent;
+    private int mEventID;
+    private int mUserID;
+
     private TextView mAuthorNickView;
     private TextView mPlaceAtView;
     private TextView mStartAtView;
@@ -47,10 +51,16 @@ public class DetailsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*  获取时间ID和用户ID */
+        mEventID = savedInstanceState.getInt("EventID",0);
+        mUserID = savedInstanceState.getInt("UserID",0);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        /*  获取界面组件  */
         View view = inflater.inflate(R.layout.fragment_details,container,false);
         mDetailsView = view;
 
@@ -64,9 +74,11 @@ public class DetailsFragment extends BaseFragment {
         mContentView = (TextView) mDetailsView.findViewById(R.id.tv_details_content);
         mSupportView = (TextView) mDetailsView.findViewById(R.id.tv_details_supporter);
 
+        /*  设置监听器   */
         setListener();
 
-        createTestEvent();
+        /*  初始化界面组件 */
+        initData();
         drawView();
         return view;
     }
@@ -100,6 +112,7 @@ public class DetailsFragment extends BaseFragment {
         releaseFragmentStack();
     }
 
+    /*  绘制界面    */
     private void drawView(){
         mAuthorNickView.setText(mEvent.author.name);
         mPlaceAtView.setText(mEvent.placeAt);
@@ -110,6 +123,7 @@ public class DetailsFragment extends BaseFragment {
         //mSupportView.setText(mEvent.supporter);
     }
 
+    /*  获取数据后刷新界面   */
     public void getData(){
         drawView();
 
@@ -122,19 +136,20 @@ public class DetailsFragment extends BaseFragment {
         mSupportView.invalidate();
     }
 
+    /*  设置事件    */
     public void setEvent(EventModel event){
         mEvent = event;
         getData();
         return;
     }
 
+    /*  设置监听器   */
     private void setListener()
     {
 
         mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createTestEvent();
                 getData();
             }
         });
@@ -147,6 +162,7 @@ public class DetailsFragment extends BaseFragment {
         });
     }
 
+    /*  释放fragment队列*/
     private void releaseFragmentStack(){
         for (int i =0;i<getFragmentManager().getBackStackEntryCount();i++){
             getFragmentManager().popBackStack();
@@ -154,7 +170,7 @@ public class DetailsFragment extends BaseFragment {
     }
     /*
         create test event
-     */
+
     private void createTestEvent(){
         if(mEvent == null) {
             mEvent = new EventModel();
@@ -176,8 +192,12 @@ public class DetailsFragment extends BaseFragment {
         //mEvent.supporter = "中共中央国务院，中共中央巡视组，中共中央统战部";
         reSolvePosterImage();
 
-    }
+    }*/
 
+    /*   启动线程，获取活动  */
+    private void initData(){
+
+    }
     /*  解析海报图像  */
     private void reSolvePosterImage(){
         int [] mImages = new int[] {

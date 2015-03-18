@@ -21,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -29,6 +30,8 @@ import android.widget.TimePicker;
 import com.ivanchou.ucasdemo.R;
 import com.ivanchou.ucasdemo.core.model.EventModel;
 import com.ivanchou.ucasdemo.core.model.TagModel;
+import com.ivanchou.ucasdemo.core.model.UserModel;
+import com.ivanchou.ucasdemo.ui.adapter.SimpleUserListAdapter;
 import com.ivanchou.ucasdemo.ui.base.BaseActivity;
 import com.ivanchou.ucasdemo.ui.base.BaseFragment;
 import com.ivanchou.ucasdemo.ui.view.DateAndTimePickerView;
@@ -54,7 +57,6 @@ public class PostNewFragment extends BaseFragment {
     private View mPostNewView;
 
     private FooterTagsView mTagsViewTags;
-    private FooterTagsView mTagsViewNames;
     private EditText mTitle;
     private EditText mLocate;
     private TextView mTextTitle;
@@ -69,10 +71,11 @@ public class PostNewFragment extends BaseFragment {
     private Switch mPrivate;
     private PopupWindow mTimePicker;
     private DateAndTimePickerView mDatePickerView;
+    private ListView mNameListView;
 
     private TagModel [] mTags;
-    private TagModel [] mNameTags;
-    private List<TagModel> mNameList;
+    private List<UserModel> mNameList;
+    private SimpleUserListAdapter mNameListAdapter;
 
     private EventModel mEvent;
     private Date mDateStartAt;
@@ -97,15 +100,15 @@ public class PostNewFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mNameLocalID = 0;
-        mNameList = new ArrayList<TagModel>();
+        mNameList = new ArrayList<UserModel>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        /*  获取各个组件  */
         mPostNewView = inflater.inflate(R.layout.fragment_post_new,container,false);
 
         mTagsViewTags = (FooterTagsView)mPostNewView.findViewById(R.id.ftv_post_new_tags);
-        mTagsViewNames = (FooterTagsView)mPostNewView.findViewById(R.id.ftv_post_new_names);
         mTitle = (EditText)mPostNewView.findViewById(R.id.et_post_new_title);
         mLocate = (EditText)mPostNewView.findViewById(R.id.et_post_new_locate_at);
         mTextTitle = (TextView)mPostNewView.findViewById(R.id.tv_post_new_title);
@@ -119,7 +122,9 @@ public class PostNewFragment extends BaseFragment {
         mMap = (Button)mPostNewView.findViewById(R.id.bt_post_new_map);
         mPrivate = (Switch)mPostNewView.findViewById(R.id.sw_post_new_private);
         mDatePickerView = (DateAndTimePickerView)mPostNewView.findViewById(R.id.dtp_time_picker);
+        mNameListView = (ListView)mPostNewView.findViewById(R.id.lv_post_new_name_list);
 
+        /*  初始化数据   */
         createTags();
         initData();
         initView();
@@ -137,6 +142,8 @@ public class PostNewFragment extends BaseFragment {
         super.onDetach();
     }
 
+    /*  获取标签
+        需要修改    */
     private void createTags(){
         String [] names = new String[]{"运动","娱乐","游戏","体育","竞技","讲座","农场","地主","训练"};
         mTags = new TagModel[9];
@@ -146,9 +153,10 @@ public class PostNewFragment extends BaseFragment {
             mTags[i].tagName = names[i];
         }
 
-        mNameTags = null;
     }
 
+    /*  初始化组件
+        在此添加监听器 */
     private void initView(){
         if (mTags != null && mTags.length != 0) {
             mTagsViewTags.setCustomTags(mTags);
@@ -161,21 +169,6 @@ public class PostNewFragment extends BaseFragment {
                 @Override
                 public void onTagLongClickRefresh(int tags) {
                     tagsChange(tags);
-                }
-            });
-        }
-
-        if(mNameTags != null && mNameTags.length != 0) {
-            mTagsViewNames.setCustomTags(mNameTags);
-            mTagsViewNames.setOnTagClickListener(new FooterTagsView.OnTagClickListener() {
-                @Override
-                public void onTagClickRefresh(int tags) {
-
-                }
-
-                @Override
-                public void onTagLongClickRefresh(int tags) {
-
                 }
             });
         }
@@ -211,7 +204,7 @@ public class PostNewFragment extends BaseFragment {
         mAdvanced.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                advancedSetting();
             }
         });
 
@@ -219,7 +212,7 @@ public class PostNewFragment extends BaseFragment {
         mPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                pushEvent();
             }
         });
 
@@ -245,8 +238,14 @@ public class PostNewFragment extends BaseFragment {
                 }
             }
         });
+
+        mNameListAdapter = new SimpleUserListAdapter(context,mNameListView);
+        mNameListView.setAdapter(mNameListAdapter);
     }
 
+    /*  初始化数据
+    *   在此启动线程，从服务器获得数据
+    *   需要修改    */
     private void initData(){
         mEvent = new EventModel();
 
@@ -257,25 +256,28 @@ public class PostNewFragment extends BaseFragment {
         mEvent.endAt = mFormat.format(mDateEndAt);
     }
 
+    /*  标签改变时，运行此函数
+    *   在此添加标题自动生成算法
+    *   需要修改    */
     private void tagsChange(int tags){
         mTitle.setText(Integer.toBinaryString(tags));
         mTitle.invalidate();
     }
 
+    /*  邀请好友
+    *   在此启动邀请好友的fragment
+    *   并且更新好友列表适配器
+    *   需要修改    */
     private void invitePeople(){
-        TagModel tagModel = new TagModel();
-        tagModel.tagId = mNameLocalID;
-        tagModel.tagName = "张氏" + (int)(Math.random()*100);
-        mNameList.add(tagModel);
-
-        mNameTags = new TagModel[mNameList.size()];
-        for (int i=0;i<mNameList.size();i++){
-            mNameTags[i] = mNameList.get(i);
-        }
-        mTagsViewNames.setCustomTags(mNameTags);
-        mTagsViewNames.invalidate();
+        UserModel userModel = new UserModel();
+        userModel.name = "张氏" + (int)(Math.random()*100);
+        mNameList.add(userModel);
+        mNameListAdapter.addData(mNameList);
+        mNameListAdapter.getTotalHeight();
+        mNameListAdapter.notifyDataSetChanged();
     }
 
+    /*  启动Popupwindow，获取用户输入时间  */
     private void pickTime(final int textViewID)
     {
         LinearLayout layout = (LinearLayout)this.getActivity().getLayoutInflater().inflate(R.layout.popup_time_picker,null);
@@ -340,10 +342,20 @@ public class PostNewFragment extends BaseFragment {
         mTimePicker.showAtLocation(mPostNewView, Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL,0,0);
     }
 
-    public void onPostNewFragmentClick(int viewID) {
+    /*  启动高级选项  */
+    private void advancedSetting(){
 
     }
 
+    /*  发布活动    */
+    private void pushEvent (){
+
+    }
+
+    /*  启动MAP   */
+    private void setMapLocate(){
+
+    }
     public interface PostNewCallback {
     }
 
